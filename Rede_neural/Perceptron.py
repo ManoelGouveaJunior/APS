@@ -1,84 +1,44 @@
-### IMPORTS ################################################
-
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import Perceptron
+from sklearn.model_selection import train_test_split as split
+import array
 
-### CONSTANTES #############################################
-
-NUM_EPOCAS = 10000
-BIAS = 1
-TAXA_APRENDIZADO = 0.1
-ATRIBUTO = 14
-
-### MODELAR DADOS ##########################################
-
-def modelar_dados():
-	### FUNCAO PARA IMPORTAR OS DADOS E GERAR OS VETORES DE INDIVIDUOS E AS RESPECTIVAS CLASSES ###
-
-	dataset_treino = pd.read_csv('leaf.csv')
-
-	classes_treino = dataset_treino['Classe'].values
+def modelar_dados ():
+	dataset = pd.read_csv('leaf.csv', header = None)
 	
-	dataset_treino.drop(['Specimen'], axis=1, inplace=True)
-	dataset_treino.drop(['Classe'], axis=1, inplace=True)
+	classes = dataset[dataset.columns[0]].values
 
-	(dataset_treino.columns[2])
+	dataset.drop([0], axis = 1, inplace = True)
+	'''
+	individuos = np.vstack((dataset[dataset.columns[0]].values,
+							dataset[dataset.columns[1]].values,
+							dataset[dataset.columns[2]].values,
+							dataset[dataset.columns[3]].values,
+							dataset[dataset.columns[4]].values,
+							dataset[dataset.columns[5]].values,
+							dataset[dataset.columns[6]].values,
+							dataset[dataset.columns[7]].values,
+							dataset[dataset.columns[8]].values,
+							dataset[dataset.columns[9]].values,
+							dataset[dataset.columns[10]].values,
+							dataset[dataset.columns[11]].values,
+							dataset[dataset.columns[12]].values,
+							dataset[dataset.columns[13]].values,))
+	'''
+	
+	ind_t, ind_te, cl_t, cl_te = split(dataset, classes, test_size = 0.8, shuffle = False)
 
-	individuos_treino = np.vstack((  dataset_treino[dataset_treino.columns[0]].values,
-									dataset_treino[dataset_treino.columns[1]].values,
-									dataset_treino[dataset_treino.columns[2]].values,
-									dataset_treino[dataset_treino.columns[3]].values,
-									dataset_treino[dataset_treino.columns[4]].values,
-									dataset_treino[dataset_treino.columns[5]].values,
-									dataset_treino[dataset_treino.columns[6]].values,
-									dataset_treino[dataset_treino.columns[7]].values,
-									dataset_treino[dataset_treino.columns[8]].values,
-									dataset_treino[dataset_treino.columns[9]].values,
-									dataset_treino[dataset_treino.columns[10]].values,
-									dataset_treino[dataset_treino.columns[11]].values,
-									dataset_treino[dataset_treino.columns[12]].values,
-									dataset_treino[dataset_treino.columns[13]].values))
-
-	return individuos_treino, classes_treino
-
-### FUNCAO DE AVALIACAO ####################################
-
-def func_ativacao(valor):
-	### FUNCAO DE AVALIACAO DO PERCEPTRON: ESTA CONFIGURADO PARA 2 SAIDAS, FALTA MODELAR PARA MAIS POSSIBILIDADES ###
-
-	if valor < 0.0:
-		return -1
-	else:
-		return  1
-
-### MAIN ###################################################
+	return ind_t, ind_te, cl_t, cl_te
 
 def main():
-	### FUNCAO PRINCIPAL, REALIZA O CALCULO DOS ERROS E CORRIGE OS PESOS DE ACORDO COM O ERRO CALCULADO ###
+	ind_treino, ind_teste, cl_treino, cl_teste = modelar_dados()
 
-	ind_treino, classes_treino = modelar_dados()
+	perc = Perceptron(verbose=0, eta0 = 0.1, max_iter=100000)
 
-	pesos = np.zeros([1, 15])
-	erro  = np.zeros(20)
+	perc.fit(ind_treino, cl_treino)
 
-	for i in range (NUM_EPOCAS):
-		for k in range (ATRIBUTO):
-
-			treino_b = np.hstack((BIAS, ind_treino[:,k]))
-
-			campo_induzido = np.dot(pesos, treino_b) + BIAS
-
-			saida_Perceptron = func_ativacao(campo_induzido)
-
-			erro[k] = classes_treino[k] - saida_Perceptron
-
-			pesos = pesos + TAXA_APRENDIZADO*erro[k]*treino_b
-
-	erro = np.array(erro)
-	print ('Erro:    ' + str(erro))
-	print ('Classes: ' + str(classes_treino))
-
-### INICIAR PROGRAMA #######################################
+	print ('Precisão Base de treino: {0:.2f}%'.format(perc.score(ind_treino,cl_treino)*100))
 
 if __name__ == '__main__':
 	main()
