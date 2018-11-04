@@ -5,7 +5,7 @@ import numpy as np
 
 ### CONSTANTES #############################################
 
-NUM_EPOCAS = 1000
+NUM_EPOCAS = 10000
 BIAS = 1
 TAXA_APRENDIZADO = 0.1
 ATRIBUTO = 14
@@ -44,9 +44,9 @@ def modelar_dados():
 ### FUNCAO DE AVALIACAO ####################################
 
 def func_ativacao(valor):
-	### FUNCAO DE AVALIACAO DO PERCEPTRON: ESTÁ CONFIGURADO PARA 2 SAIDAS, FALTA MODELAR PARA MAIS POSSIBILIDADES ###
+	### FUNCAO DE AVALIACAO DO PERCEPTRON: ESTA CONFIGURADO PARA 2 SAIDAS, FALTA MODELAR PARA MAIS POSSIBILIDADES ###
 
-	if valor < 0:
+	if valor < 0.0:
 		return -1
 	else:
 		return  1
@@ -59,14 +59,14 @@ def main():
 	ind_treino, classes_treino = modelar_dados()
 
 	pesos = np.zeros([1, 15])
-	erro  = np.zeros(14)
+	erro  = np.zeros(20)
 
 	for i in range (NUM_EPOCAS):
 		for k in range (ATRIBUTO):
 
 			treino_b = np.hstack((BIAS, ind_treino[:,k]))
 
-			campo_induzido = np.dot(pesos, treino_b)
+			campo_induzido = np.dot(pesos, treino_b) + BIAS
 
 			saida_Perceptron = func_ativacao(campo_induzido)
 
